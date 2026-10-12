@@ -115,7 +115,7 @@ app.get('/', (req, res) => {
             :root { --primary: #6366f1; --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --accent: #10b981; --border: #334155; }
             body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding: 20px; margin: 0; }
             .container { max-width: 1200px; margin: 0 auto; }
-            h1 { color: --primary; display: flex; align-items: center; gap: 10px; }
+            h1 { color: var(--primary); display: flex; align-items: center; gap: 10px; }
             .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; margin-bottom: 20px; }
             .card { background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
             h2 { color: #38bdf8; margin-top: 0; font-size: 18px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
@@ -282,7 +282,6 @@ app.get('/', (req, res) => {
   `);
 });
 
-// Página Web del Cliente Final (Con imágenes verticales grandes, carrusel y música)
 app.get('/web', (req, res) => {
   const productosHTML = inventario.map(p => `
     <div class="product-card">
@@ -290,12 +289,10 @@ app.get('/web', (req, res) => {
             <source src="${p.videoDemo}" type="video/mp4">
         </video>
         
-        <!-- Imagen Principal Vertical Grande (Alta Calidad) -->
         <div style="margin: 12px 0; text-align:center;">
             <img id="img-principal-${p.id}" src="${p.imagenes[0]}" style="width:100%; height:380px; object-fit:cover; border-radius:12px; border:1px solid #cbd5e1;" alt="Foto Vertical HD">
         </div>
 
-        <!-- Galería Carrusel de Miniaturas Clickeables -->
         <div class="thumb-gallery" style="display:flex; justify-content:center; gap:8px; margin-bottom:12px; overflow-x:auto;">
             ${p.imagenes.map((img, idx) => `
                 <img src="${img}" 
