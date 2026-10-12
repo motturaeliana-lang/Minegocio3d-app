@@ -278,7 +278,7 @@ app.get('/web', (req, res) => {
             <img id="img-principal-${p.id}" src="${p.imagenes[0]}" style="width:100%; height:180px; object-fit:cover; border-radius:8px; border:1px solid #cbd5e1;" alt="Foto Principal">
         </div>
 
-        <!-- Galería de Miniaturas Deslizables / Clickeables -->
+        <!-- Galería de Miniaturas Deslizables -->
         <div class="thumb-gallery" style="display:flex; justify-content:center; gap:8px; margin-bottom:10px; overflow-x:auto;">
             ${p.imagenes.map((img, idx) => `
                 <img src="${img}" 
@@ -294,7 +294,7 @@ app.get('/web', (req, res) => {
         
         <div class="buy-buttons">
             <a href="https://wa.me/${configuracionTienda.whatsapp}?text=Hola!%20Quiero%20comprar:%20${encodeURIComponent(p.nombre)}" target="_blank" class="btn-whatsapp">💬 Comprar por WhatsApp</a>
-            <a href="https://mpago.la/start" target="_blank" class="btn-mp">💳 Pagar Online (Mercado Pago / Getnet)</a>
+            <a href="https://wa.me/${configuracionTienda.whatsapp}?text=Hola!%20Quiero%20pagar%20online%20el%20producto:%20${encodeURIComponent(p.nombre)}%20(Precio:%20$%20${p.precio})" target="_blank" class="btn-mp">💳 Pagar Online (Mercado Pago / Getnet)</a>
         </div>
     </div>
   `).join('');
