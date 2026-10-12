@@ -46,7 +46,14 @@ let inventario = [
 ];
 
 let agenda = [
-  { id: 1, producto: "Soporte Cyberpunk", formato: "Reel 9:16 + Carrusel HD", estado: "Pendiente de aprobación" }
+  { 
+    id: 1, 
+    producto: "Soporte Cyberpunk", 
+    formato: "Reel 9:16 + Carrusel HD", 
+    imagenPreview: "https://images.unsplash.com/photo-1584438784894-089d6a62b8fa?w=600",
+    videoPreview: "https://assets.mixkit.co/videos/preview/mixkit-futuristic-light-tunnel-3-41372-large.mp4",
+    estado: "Pendiente de aprobación" 
+  }
 ];
 
 app.post('/actualizar-config', (req, res) => {
@@ -76,6 +83,8 @@ app.post('/agregar-producto', upload.fields([{ name: 'foto' }]), (req, res) => {
       id: Date.now(),
       producto: nombre,
       formato: "Carrusel Vertical HD + Reel 9:16",
+      imagenPreview: fotoPath,
+      videoPreview: "https://assets.mixkit.co/videos/preview/mixkit-hands-holding-a-3d-printer-nozzle-42992-large.mp4",
       estado: "Listo para publicar"
     });
   }
@@ -91,10 +100,25 @@ app.get('/', (req, res) => {
   `).join('');
 
   const agendaHTML = agenda.map(a => `
-    <li style="background:#0b0f19; padding:10px; border-radius:6px; margin-bottom:8px; border:1px solid #334155;">
+    <li style="background:#0b0f19; padding:12px; border-radius:8px; margin-bottom:12px; border:1px solid #334155;">
         <b>📦 ${a.producto}</b><br>
-        <span style="color: #38bdf8; font-size: 13px;">📱 ${a.formato}</span><br>
-        <button onclick="alert('✅ ¡Publicado con éxito en Instagram y Web!'); location.reload();" style="background:#10b981; padding:6px 12px; font-size:12px; margin-top:8px; width:auto;">🚀 Autorizar y Publicar</button>
+        <span style="color: #38bdf8; font-size: 13px;">📱 ${a.formato}</span>
+        
+        <!-- Previsualización Multimedia en la Agenda -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0;">
+            <div style="text-align:center;">
+                <p style="font-size: 10px; color: #94a3b8; margin: 0 0 4px 0;">Foto Contexto HD</p>
+                <img src="${a.imagenPreview}" style="width:100%; height:110px; object-fit:cover; border-radius:6px; border:1px solid #475569;" alt="Preview Foto">
+            </div>
+            <div style="text-align:center;">
+                <p style="font-size: 10px; color: #94a3b8; margin: 0 0 4px 0;">Reel 9:16</p>
+                <video autoplay muted loop playsinline style="width:100%; height:110px; object-fit:cover; border-radius:6px; border:1px solid #475569; background:#000;">
+                    <source src="${a.videoPreview}" type="video/mp4">
+                </video>
+            </div>
+        </div>
+
+        <button onclick="alert('✅ ¡Kit multimedia autorizado y publicado con éxito en Instagram y Web!'); location.reload();" style="background:#10b981; padding:8px 12px; font-size:12px; width:100%;">🚀 Autorizar y Publicar en Redes</button>
     </li>
   `).join('');
 
@@ -174,9 +198,13 @@ app.get('/', (req, res) => {
                 <div class="card">
                     <h2>📸 Subir Foto Real & Generar Kit IA</h2>
                     <form action="/agregar-producto" method="POST" enctype="multipart/form-data">
-                        <input type="text" name="nombre" placeholder="Nombre de la pieza" required>
+                        <label>Nombre de la Pieza:</label>
+                        <input type="text" name="nombre" placeholder="Ej: Maceta geométrica" required>
+                        <label>Stock:</label>
                         <input type="number" name="stock" placeholder="Stock" required>
-                        <input type="number" name="precio" placeholder="Precio ($)" required>
+                        <label>Precio ($):</label>
+                        <input type="number" name="precio" placeholder="Precio" required>
+                        <label>Foto Real de la Pieza:</label>
                         <input type="file" name="foto" accept="image/*" required>
                         <button type="submit" class="success">✨ Generar Kit Publicitario y Reel</button>
                     </form>
@@ -194,7 +222,7 @@ app.get('/', (req, res) => {
 
             <div class="grid">
                 <div class="card">
-                    <h2>📅 Autorización de Publicaciones</h2>
+                    <h2>📅 Autorización de Publicaciones (Con Previsualización)</h2>
                     <ul>${agendaHTML}</ul>
                 </div>
                 <div class="card">
