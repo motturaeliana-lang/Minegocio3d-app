@@ -49,9 +49,10 @@ let agenda = [
   { 
     id: 1, 
     producto: "Soporte Cyberpunk", 
-    formato: "Reel 9:16 + Carrusel HD", 
+    formato: "Reel Estratégico (Tendencia Alta Rotación)", 
+    hook: "🔥 '¿Tu escritorio es un caos? Mirá cómo transformamos este espacio en 3D'",
+    audio: "Audio en tendencia: Synthwave Dinámico",
     imagenPreview: "https://images.unsplash.com/photo-1584438784894-089d6a62b8fa?w=600",
-    videoPreview: "https://assets.mixkit.co/videos/preview/mixkit-futuristic-light-tunnel-3-41372-large.mp4",
     estado: "Pendiente de aprobación" 
   }
 ];
@@ -82,9 +83,10 @@ app.post('/agregar-producto', upload.fields([{ name: 'foto' }]), (req, res) => {
     agenda.push({
       id: Date.now(),
       producto: nombre,
-      formato: "Carrusel Vertical HD + Reel 9:16",
+      formato: "Reel Estratégico de Alta Conversión",
+      hook: `🚀 'Impresión 3D de nivel pro: Descubrí el nuevo ${nombre}'`,
+      audio: "Audio en tendencia: Beats Comerciales Energéticos",
       imagenPreview: fotoPath,
-      videoPreview: "https://assets.mixkit.co/videos/preview/mixkit-hands-holding-a-3d-printer-nozzle-42992-large.mp4",
       estado: "Listo para publicar"
     });
   }
@@ -100,25 +102,25 @@ app.get('/', (req, res) => {
   `).join('');
 
   const agendaHTML = agenda.map(a => `
-    <li style="background:#0b0f19; padding:12px; border-radius:8px; margin-bottom:12px; border:1px solid #334155;">
-        <b>📦 ${a.producto}</b><br>
-        <span style="color: #38bdf8; font-size: 13px;">📱 ${a.formato}</span>
+    <li style="background:#0b0f19; padding:14px; border-radius:8px; margin-bottom:14px; border:1px solid #334155;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <b>📦 ${a.producto}</b>
+            <span style="background:#1e293b; color:#38bdf8; padding:2px 8px; border-radius:12px; font-size:11px;">Analizado por Mercado IA</span>
+        </div>
         
-        <!-- Previsualización Multimedia en la Agenda -->
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0;">
-            <div style="text-align:center;">
-                <p style="font-size: 10px; color: #94a3b8; margin: 0 0 4px 0;">Foto Contexto HD</p>
-                <img src="${a.imagenPreview}" style="width:100%; height:110px; object-fit:cover; border-radius:6px; border:1px solid #475569;" alt="Preview Foto">
-            </div>
-            <div style="text-align:center;">
-                <p style="font-size: 10px; color: #94a3b8; margin: 0 0 4px 0;">Reel 9:16</p>
-                <video autoplay muted loop playsinline style="width:100%; height:110px; object-fit:cover; border-radius:6px; border:1px solid #475569; background:#000;">
-                    <source src="${a.videoPreview}" type="video/mp4">
-                </video>
+        <!-- Previsualización del Reel Generado -->
+        <div style="background:#1e293b; border-radius:8px; padding:10px; border:1px solid #475569; margin-bottom:10px;">
+            <div style="display:flex; gap:12px; align-items:center;">
+                <img src="${a.imagenPreview}" style="width:70px; height:90px; object-fit:cover; border-radius:6px; border:1px solid #334155;" alt="Preview">
+                <div style="font-size:12px; color:#cbd5e1;">
+                    <p style="margin:0 0 4px 0; color:#38bdf8; font-weight:bold;">🎬 Guion & Estructura del Reel (9:16):</p>
+                    <p style="margin:0 0 4px 0; font-style:italic;">${a.hook}</p>
+                    <p style="margin:0; color:#94a3b8;">🎵 ${a.audio}</p>
+                </div>
             </div>
         </div>
 
-        <button onclick="alert('✅ ¡Kit multimedia autorizado y publicado con éxito en Instagram y Web!'); location.reload();" style="background:#10b981; padding:8px 12px; font-size:12px; width:100%;">🚀 Autorizar y Publicar en Redes</button>
+        <button onclick="alert('✅ ¡Reel y kit publicitario autorizados y publicados con éxito en Instagram y Web!'); location.reload();" style="background:#10b981; padding:8px 12px; font-size:12px; width:100%;">🚀 Autorizar y Publicar en Redes</button>
     </li>
   `).join('');
 
@@ -196,17 +198,17 @@ app.get('/', (req, res) => {
 
             <div class="grid">
                 <div class="card">
-                    <h2>📸 Subir Foto Real & Generar Kit IA</h2>
+                    <h2>📸 Subir Foto Real & Generar Reel Estratégico IA</h2>
                     <form action="/agregar-producto" method="POST" enctype="multipart/form-data">
                         <label>Nombre de la Pieza:</label>
-                        <input type="text" name="nombre" placeholder="Ej: Maceta geométrica" required>
+                        <input type="text" name="nombre" placeholder="Ej: Portasahumerio vertical" required>
                         <label>Stock:</label>
                         <input type="number" name="stock" placeholder="Stock" required>
                         <label>Precio ($):</label>
                         <input type="number" name="precio" placeholder="Precio" required>
                         <label>Foto Real de la Pieza:</label>
                         <input type="file" name="foto" accept="image/*" required>
-                        <button type="submit" class="success">✨ Generar Kit Publicitario y Reel</button>
+                        <button type="submit" class="success">✨ Generar Reel de Alto Impacto Comercial</button>
                     </form>
                 </div>
 
@@ -222,7 +224,7 @@ app.get('/', (req, res) => {
 
             <div class="grid">
                 <div class="card">
-                    <h2>📅 Autorización de Publicaciones (Con Previsualización)</h2>
+                    <h2>📅 Autorización de Reels (Basado en Mercado)</h2>
                     <ul>${agendaHTML}</ul>
                 </div>
                 <div class="card">
