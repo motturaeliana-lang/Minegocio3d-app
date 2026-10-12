@@ -25,7 +25,7 @@ const upload = multer({ storage: storage });
 let configuracionTienda = {
   nombre: "GRUMI 3D Store",
   instagram: "@grumi3d",
-  whatsapp: "5493496XXXXXXXX", // Reemplaza aquí con tu número real sin espacios ni símbolos
+  whatsapp: "5493496XXXXXXXX", 
   celularNoti: "5493496XXXXXXXX"
 };
 
@@ -37,7 +37,8 @@ let inventario = [
     precio: 15000, 
     imagenes: [
       "https://images.unsplash.com/photo-1584438784894-089d6a62b8fa?w=400",
-      "https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=400"
+      "https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=400",
+      "https://images.unsplash.com/photo-1615840287214-7ff58936c4cf?w=400"
     ],
     videoDemo: "https://assets.mixkit.co/videos/preview/mixkit-futuristic-light-tunnel-3-41372-large.mp4"
   }
@@ -58,7 +59,7 @@ let tendenciasMercado = [
 app.post('/actualizar-config', (req, res) => {
   configuracionTienda.nombre = req.body.nombre;
   configuracionTienda.instagram = req.body.instagram;
-  configuracionTienda.whatsapp = req.body.whatsapp.replace(/\D/g,''); // Limpia cualquier carácter que no sea número
+  configuracionTienda.whatsapp = req.body.whatsapp.replace(/\D/g,'');
   configuracionTienda.celularNoti = req.body.celularNoti;
   res.redirect('/');
 });
@@ -97,7 +98,7 @@ app.get('/', (req, res) => {
     <html lang="es">
     <head>
         <meta charset="UTF-8">
-        <title>${configuracionTienda.nombre} - Cloud Production</title>
+        <title>${configuracionTienda.nombre} - Panel de Control</title>
         <style>
             :root { --primary: #6366f1; --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --accent: #10b981; --border: #334155; }
             body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding: 20px; margin: 0; }
@@ -176,7 +177,7 @@ app.get('/', (req, res) => {
                         <div class="media-preview">
                             <p style="font-size: 11px; color: #38bdf8; margin: 3px 0;"><b>Reel / TikTok (Bucle)</b></p>
                             <video autoplay muted loop playsinline>
-                                <source src="https://assets.mixkit.co/videos/preview/mixkit-futuristic-light-tunnel-3-41372-large.mp4" type="video/mp4">
+                                <source src="https://assets.mixkit.co/videos/preview/mixkit-hands-holding-a-3d-printer-nozzle-42992-large.mp4" type="video/mp4">
                             </video>
                         </div>
                     </div>
@@ -271,15 +272,29 @@ app.get('/web', (req, res) => {
         <video autoplay muted loop playsinline class="product-video">
             <source src="${p.videoDemo}" type="video/mp4">
         </video>
-        <div class="thumb-gallery" style="display:flex; justify-content:center; gap:8px; margin:10px 0;">
-            ${p.imagenes.map(img => `<img src="${img}" style="width:45px; height:45px; object-fit:cover; border-radius:4px; border:1px solid #cbd5e1;" alt="Thumb">`).join('')}
+        
+        <!-- Imagen Principal Interactiva -->
+        <div style="margin: 10px 0;">
+            <img id="img-principal-${p.id}" src="${p.imagenes[0]}" style="width:100%; height:180px; object-fit:cover; border-radius:8px; border:1px solid #cbd5e1;" alt="Foto Principal">
         </div>
+
+        <!-- Galería de Miniaturas Deslizables / Clickeables -->
+        <div class="thumb-gallery" style="display:flex; justify-content:center; gap:8px; margin-bottom:10px; overflow-x:auto;">
+            ${p.imagenes.map((img, idx) => `
+                <img src="${img}" 
+                     style="width:45px; height:45px; object-fit:cover; border-radius:4px; border:2px solid #6366f1; cursor:pointer;" 
+                     onclick="document.getElementById('img-principal-${p.id}').src='${img}'" 
+                     title="Ver foto ${idx + 1}" alt="Miniatura">
+            `).join('')}
+        </div>
+
         <h3>${p.nombre}</h3>
         <p style="color: #64748b; font-size: 14px;">Stock: ${p.stock} unidades</p>
         <div class="price">$${p.precio.toLocaleString()}</div>
+        
         <div class="buy-buttons">
             <a href="https://wa.me/${configuracionTienda.whatsapp}?text=Hola!%20Quiero%20comprar:%20${encodeURIComponent(p.nombre)}" target="_blank" class="btn-whatsapp">💬 Comprar por WhatsApp</a>
-            <a href="#" onclick="alert('Redirigiendo a pasarela segura...'); return false;" class="btn-mp">💳 Pagar Online</a>
+            <a href="https://mpago.la/start" target="_blank" class="btn-mp">💳 Pagar Online (Mercado Pago / Getnet)</a>
         </div>
     </div>
   `).join('');
@@ -289,7 +304,7 @@ app.get('/web', (req, res) => {
     <html lang="es">
     <head>
         <meta charset="UTF-8">
-        <title>${configuracionTienda.nombre}</title>
+        <title>${configuracionTienda.nombre} - Tienda Oficial</title>
         <style>
             body { font-family: 'Segoe UI', sans-serif; background: #f8fafc; color: #1e293b; margin: 0; padding: 0; }
             header { background: #0f172a; color: white; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; }
@@ -298,7 +313,7 @@ app.get('/web', (req, res) => {
             .container { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
             .products-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; }
             .product-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; text-align: center; display: flex; flex-direction: column; justify-content: space-between; }
-            .product-video { width: 100%; height: 160px; object-fit: cover; border-radius: 8px; margin-bottom: 5px; background: #000; }
+            .product-video { width: 100%; height: 140px; object-fit: cover; border-radius: 8px; margin-bottom: 5px; background: #000; }
             .price { font-size: 22px; font-weight: bold; color: #6366f1; margin: 10px 0; }
             .buy-buttons { display: flex; flex-direction: column; gap: 8px; margin-top: 15px; }
             .btn-whatsapp { background: #25d366; color: white; text-decoration: none; padding: 10px; border-radius: 6px; font-weight: bold; font-size: 14px; }
