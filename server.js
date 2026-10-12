@@ -37,6 +37,7 @@ let inventario = [
     nombre: "Soporte Cyberpunk", 
     stock: 12, 
     precio: 15000, 
+    oferta: "¡10% OFF pagando en efectivo!",
     imagenes: [
       "https://images.unsplash.com/photo-1584438784894-089d6a62b8fa?w=600",
       "https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=600"
@@ -49,11 +50,9 @@ let agenda = [
   { 
     id: 1, 
     producto: "Soporte Cyberpunk", 
-    formato: "Reel Estratégico (Tendencia Alta Rotación)", 
-    hook: "🔥 '¿Tu escritorio es un caos? Mirá cómo transformamos este espacio en 3D'",
-    audio: "Audio en tendencia: Synthwave Dinámico",
-    imagenPreview: "https://images.unsplash.com/photo-1584438784894-089d6a62b8fa?w=600",
-    estado: "Pendiente de aprobación" 
+    formato: "Reel Estratégico 9:16 + Carrusel HD", 
+    hook: "🔥 '¿Tu escritorio es un caos? Transformalo con impresión 3D'",
+    imagenPreview: "https://images.unsplash.com/photo-1584438784894-089d6a62b8fa?w=600"
   }
 ];
 
@@ -68,59 +67,71 @@ app.post('/actualizar-config', (req, res) => {
 });
 
 app.post('/agregar-producto', upload.fields([{ name: 'foto' }]), (req, res) => {
-  const { nombre, stock, precio } = req.body;
+  const { nombre, stock, precio, oferta } = req.body;
   const fotoPath = req.files['foto'] ? `/uploads/${req.files['foto'][0].filename}` : "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600";
   
   if (nombre && stock && precio) {
+    const nuevoId = Date.now();
     inventario.push({
-      id: Date.now(),
+      id: nuevoId,
       nombre,
       stock: parseInt(stock),
       precio: parseFloat(precio),
+      oferta: oferta || "Disponible en stock",
       imagenes: [fotoPath, "https://images.unsplash.com/photo-1584438784894-089d6a62b8fa?w=600"],
       videoDemo: "https://assets.mixkit.co/videos/preview/mixkit-hands-holding-a-3d-printer-nozzle-42992-large.mp4"
     });
     agenda.push({
-      id: Date.now(),
+      id: nuevoId,
       producto: nombre,
-      formato: "Reel Estratégico de Alta Conversión",
-      hook: `🚀 'Impresión 3D de nivel pro: Descubrí el nuevo ${nombre}'`,
-      audio: "Audio en tendencia: Beats Comerciales Energéticos",
-      imagenPreview: fotoPath,
-      estado: "Listo para publicar"
+      formato: "Carrusel Vertical HD + Reel Comercial",
+      hook: ` 'Descubrí la nueva pieza exclusiva: ${nombre}'`,
+      imagenPreview: fotoPath
     });
   }
   res.redirect('/');
 });
 
+app.post('/eliminar-producto', (req, res) => {
+  const idProd = parseInt(req.body.id);
+  inventario = inventario.filter(p => p.id !== idProd);
+  agenda = agenda.filter(a => a.id !== idProd);
+  res.redirect('/');
+});
+
 app.get('/', (req, res) => {
-  const invHTML = inventario.map(p => `
-    <li style="display:flex; align-items:center; gap:10px; background:#0b0f19; padding:8px; border-radius:6px; margin-bottom:6px; border:1px solid #334155;">
-        <img src="${p.imagenes[0]}" style="width:40px; height:50px; object-fit:cover; border-radius:4px;" alt="Miniatura">
-        <div><b>${p.nombre}</b><br><span style="font-size:12px; color:#38bdf8;">Stock: ${p.stock}u | $${p.precio}</span></div>
-    </li>
+  // Administrador de Inventario con opción de eliminar y ver fotos reales
+  const gestionInventarioHTML = inventario.map(p => `
+    <div style="display:flex; justify-content:space-between; align-items:center; background:#0b0f19; padding:10px; border-radius:6px; margin-bottom:8px; border:1px solid #334155;">
+        <div style="display:flex; align-items:center; gap:10px;">
+            <img src="${p.imagenes[0]}" style="width:45px; height:60px; object-fit:cover; border-radius:4px; border:1px solid #475569;" alt="Foto real">
+            <div>
+                <b style="color:#f8fafc;">${p.nombre}</b><br>
+                <span style="font-size:12px; color:#38bdf8;">Stock: ${p.stock}u | Precio: $${p.precio}</span><br>
+                <span style="font-size:11px; color:#10b981;">💡 ${p.oferta}</span>
+            </div>
+        </div>
+        <form action="/eliminar-producto" method="POST" style="margin:0;">
+            <input type="hidden" name="id" value="${p.id}">
+            <button type="submit" style="background:#ef4444; padding:6px 10px; font-size:11px; width:auto; margin:0;">🗑️ Eliminar</button>
+        </form>
+    </div>
   `).join('');
 
   const agendaHTML = agenda.map(a => `
-    <li style="background:#0b0f19; padding:14px; border-radius:8px; margin-bottom:14px; border:1px solid #334155;">
+    <li style="background:#0b0f19; padding:14px; border-radius:8px; margin-bottom:12px; border:1px solid #334155;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
             <b>📦 ${a.producto}</b>
-            <span style="background:#1e293b; color:#38bdf8; padding:2px 8px; border-radius:12px; font-size:11px;">Analizado por Mercado IA</span>
+            <span style="background:#1e293b; color:#38bdf8; padding:2px 8px; border-radius:12px; font-size:11px;">IA Comercial</span>
         </div>
-        
-        <!-- Previsualización del Reel Generado -->
-        <div style="background:#1e293b; border-radius:8px; padding:10px; border:1px solid #475569; margin-bottom:10px;">
-            <div style="display:flex; gap:12px; align-items:center;">
-                <img src="${a.imagenPreview}" style="width:70px; height:90px; object-fit:cover; border-radius:6px; border:1px solid #334155;" alt="Preview">
-                <div style="font-size:12px; color:#cbd5e1;">
-                    <p style="margin:0 0 4px 0; color:#38bdf8; font-weight:bold;">🎬 Guion & Estructura del Reel (9:16):</p>
-                    <p style="margin:0 0 4px 0; font-style:italic;">${a.hook}</p>
-                    <p style="margin:0; color:#94a3b8;">🎵 ${a.audio}</p>
-                </div>
+        <div style="display:flex; gap:12px; align-items:center; background:#1e293b; padding:10px; border-radius:6px; border:1px solid #475569; margin-bottom:10px;">
+            <img src="${a.imagenPreview}" style="width:65px; height:85px; object-fit:cover; border-radius:4px; border:1px solid #334155;" alt="Preview">
+            <div style="font-size:12px; color:#cbd5e1;">
+                <p style="margin:0 0 4px 0; color:#38bdf8; font-weight:bold;">🎬 Reel & Hook:</p>
+                <p style="margin:0; font-style:italic;">${a.hook}</p>
             </div>
         </div>
-
-        <button onclick="alert('✅ ¡Reel y kit publicitario autorizados y publicados con éxito en Instagram y Web!'); location.reload();" style="background:#10b981; padding:8px 12px; font-size:12px; width:100%;">🚀 Autorizar y Publicar en Redes</button>
+        <button onclick="alert('✅ ¡Publicado con éxito en Instagram y Web!'); location.reload();" style="background:#10b981; padding:8px; font-size:12px; width:100%;">🚀 Autorizar y Publicar</button>
     </li>
   `).join('');
 
@@ -129,7 +140,7 @@ app.get('/', (req, res) => {
     <html lang="es">
     <head>
         <meta charset="UTF-8">
-        <title>${configuracion.nombre} - Panel Cloud</title>
+        <title>${configuracion.nombre} - Panel Cloud Definitivo</title>
         <style>
             :root { --primary: #6366f1; --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --accent: #10b981; --border: #334155; }
             body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding: 20px; margin: 0; }
@@ -143,15 +154,11 @@ app.get('/', (req, res) => {
             button.success { background: var(--accent); }
             input, textarea { width: 100%; padding: 10px; margin: 8px 0 15px 0; background: #0f172a; border: 1px solid #475569; color: white; border-radius: 6px; box-sizing: border-box; }
             ul { padding-left: 0; list-style: none; }
-            .stat-box { display: flex; justify-content: space-between; background: #0f172a; padding: 12px; border-radius: 6px; margin-bottom: 8px; border: 1px solid var(--border); }
-            .chat-box { background: #0f172a; height: 180px; border-radius: 6px; padding: 10px; overflow-y: auto; border: 1px solid var(--border); margin-bottom: 10px; font-size: 14px; }
-            .chat-msg { margin-bottom: 8px; } .chat-msg.bot { color: #38bdf8; }
-            .palette-btn { width: 32px; height: 32px; border-radius: 50%; border: 2px solid #fff; cursor: pointer; display: inline-block; margin-right: 8px; }
         </style>
     </head>
     <body>
         <div class="container">
-            <h1>🚀 ${configuracion.nombre} <span style="font-size: 14px; background: #334155; padding: 4px 10px; border-radius: 20px; color: #fff;">Cloud 24/7</span></h1>
+            <h1> ${configuracion.nombre} <span style="font-size: 14px; background: #334155; padding: 4px 10px; border-radius: 20px; color: #fff;">Cloud 24/7</span></h1>
             
             <div class="grid">
                 <div class="card">
@@ -175,84 +182,35 @@ app.get('/', (req, res) => {
                 </div>
 
                 <div class="card">
-                    <h2>🎨 Estudio STL (Pincel Multicolor & Pines)</h2>
-                    <p style="font-size: 13px; color: #94a3b8;">Diseña, pinta por zonas y divide con pines para tu laminador:</p>
-                    <textarea id="promptStl" placeholder="Descripción del diseño 3D..." style="height: 40px;"></textarea>
-                    <input type="file" accept=".stl,.3mf,image/*">
-                    
-                    <div style="background:#0b0f19; padding:10px; border-radius:6px; margin-top:10px; border:1px solid #334155;">
-                        <p style="font-size:12px; color:#38bdf8; margin:0 0 8px 0;"><b>🖌️ Pincel de Pintura Multicolor:</b></p>
-                        <div>
-                            <span class="palette-btn" style="background:#ef4444;" onclick="setColor('#ef4444')" title="Rojo"></span>
-                            <span class="palette-btn" style="background:#3b82f6;" onclick="setColor('#3b82f6')" title="Azul"></span>
-                            <span class="palette-btn" style="background:#10b981;" onclick="setColor('#10b981')" title="Verde"></span>
-                            <span class="palette-btn" style="background:#f59e0b;" onclick="setColor('#f59e0b')" title="Amarillo"></span>
-                        </div>
-                        <p id="infoPincel" style="font-size:11px; color:#94a3b8; margin:6px 0 0 0;">Color activo: <b style="color:#ef4444;">Rojo</b></p>
-                    </div>
-
-                    <button class="success" onclick="dividirStl()" style="margin-top:10px;">🔪 Dividir por Colores y Descargar STL</button>
-                    <div id="resStl" style="margin-top:10px; font-size:13px; color:#10b981;"></div>
-                </div>
-            </div>
-
-            <div class="grid">
-                <div class="card">
-                    <h2>📸 Subir Foto Real & Generar Reel Estratégico IA</h2>
+                    <h2>📸 Subir Producto, Foto Real & Oferta</h2>
                     <form action="/agregar-producto" method="POST" enctype="multipart/form-data">
                         <label>Nombre de la Pieza:</label>
-                        <input type="text" name="nombre" placeholder="Ej: Portasahumerio vertical" required>
+                        <input type="text" name="nombre" placeholder="Ej: Maceta geométrica" required>
                         <label>Stock:</label>
                         <input type="number" name="stock" placeholder="Stock" required>
                         <label>Precio ($):</label>
                         <input type="number" name="precio" placeholder="Precio" required>
+                        <label>Oferta / Descripción promocional:</label>
+                        <input type="text" name="oferta" placeholder="Ej: 15% OFF abonando en efectivo">
                         <label>Foto Real de la Pieza:</label>
                         <input type="file" name="foto" accept="image/*" required>
-                        <button type="submit" class="success">✨ Generar Reel de Alto Impacto Comercial</button>
+                        <button type="submit" class="success">✨ Publicar en Catálogo y Generar Reel</button>
                     </form>
-                </div>
-
-                <div class="card">
-                    <h2>🤖 Asesor Comercial & Bot IA</h2>
-                    <div class="chat-box" id="botChat">
-                        <div class="chat-msg bot"><b>Asesor GRUMI:</b> Hola Eliana. Atendiendo consultas 24/7.</div>
-                    </div>
-                    <input type="text" id="botInput" placeholder="Simula cliente...">
-                    <button onclick="probarBot()" class="success">Enviar</button>
                 </div>
             </div>
 
             <div class="grid">
                 <div class="card">
-                    <h2>📅 Autorización de Reels (Basado en Mercado)</h2>
+                    <h2>📅 Autorización de Reels & Contenido</h2>
                     <ul>${agendaHTML}</ul>
                 </div>
                 <div class="card">
-                    <h2>📦 Inventario Activo</h2>
-                    <ul>${invHTML}</ul>
+                    <h2>📦 Administrador de Catálogo (Inventario)</h2>
+                    <p style="font-size:12px; color:#94a3b8; margin-bottom:10px;">Aquí puedes ver tus productos y eliminarlos si ya no están disponibles:</p>
+                    ${gestionInventarioHTML}
                 </div>
             </div>
         </div>
-
-        <script>
-            function setColor(c) {
-                document.getElementById('infoPincel').innerHTML = 'Color activo: <span style="background:'+c+'; padding:2px 8px; border-radius:4px; color:#fff;">'+c+'</span>';
-            }
-            function dividirStl() {
-                document.getElementById('resStl').innerHTML = '✔ Piezas divididas con pines.<br><a href="#" onclick="alert(\'Descargando archivo .stl...\'); return false;" style="color:#38bdf8;">📥 Descargar STL por Colores</a>';
-            }
-            function probarBot() {
-                const input = document.getElementById('botInput');
-                const chat = document.getElementById('botChat');
-                if(!input.value) return;
-                chat.innerHTML += '<div class="chat-msg"><b>Cliente:</b> ' + input.value + '</div>';
-                input.value = '';
-                setTimeout(() => {
-                    chat.innerHTML += '<div class="chat-msg bot"><b>Asesor GRUMI:</b> ¡Hola! Con gusto te asesoro. (Alerta enviada a tu WhatsApp).</div>';
-                    setTimeout(() => { alert('💬 [WhatsApp Alerta]: ¡Nueva consulta comercial!'); }, 300);
-                }, 800);
-            }
-        </script>
     </body>
     </html>
   `);
@@ -275,6 +233,7 @@ app.get('/web', (req, res) => {
         <h3>${p.nombre}</h3>
         <p style="color: #64748b; font-size: 14px;">Stock: ${p.stock} unidades</p>
         <div class="price">$${p.precio.toLocaleString()}</div>
+        <p style="color: #ef4444; font-size: 13px; font-weight:bold; background:#ffeeef; padding:4px; border-radius:4px;">🔥 ${p.oferta}</p>
         <p style="color: #059669; font-size: 13px; font-weight:600;">💳 ${configuracion.cuotasInfo}</p>
         <div class="buy-buttons">
             <a href="https://wa.me/${configuracion.whatsapp}?text=Hola!%20Quiero%20comprar:%20${encodeURIComponent(p.nombre)}" target="_blank" class="btn-whatsapp">💬 Comprar por WhatsApp</a>
@@ -314,7 +273,7 @@ app.get('/web', (req, res) => {
             </audio>
         </div>
         <header>
-            <h2>🚀 ${configuracion.nombre}</h2>
+            <h2> ${configuracion.nombre}</h2>
             <div class="socials">
                 <a href="https://instagram.com/${configuracion.instagram}" target="_blank">📸 Instagram</a>
                 <a href="https://wa.me/${configuracion.whatsapp}" target="_blank">💬 WhatsApp</a>
@@ -322,7 +281,7 @@ app.get('/web', (req, res) => {
         </header>
         <div class="hero">
             <h1>Impresión 3D Autónoma 24/7</h1>
-            <p>Catálogo en vivo con fotos verticales HD y videos en bucle.</p>
+            <p>Catálogo en vivo con fotos verticales HD, ofertas y videos en bucle.</p>
         </div>
         <div class="container">
             <h2>Catálogo Exclusivo</h2>
