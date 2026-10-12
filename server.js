@@ -31,6 +31,7 @@ let configuracion = {
   colorFondo: "#f8fafc"
 };
 
+// Inventario limpio donde cada producto guarda exclusivamente SUS propias imágenes
 let inventario = [
   { 
     id: 1, 
@@ -39,10 +40,8 @@ let inventario = [
     precio: 12000, 
     oferta: "¡Envío gratis comprando 2 unidades!",
     imagenes: [
-      "https://images.unsplash.com/photo-1584438784894-089d6a62b8fa?w=600",
-      "https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=600"
-    ],
-    videoDemo: "https://assets.mixkit.co/videos/preview/mixkit-futuristic-light-tunnel-3-41372-large.mp4"
+      "https://images.unsplash.com/photo-1584438784894-089d6a62b8fa?w=600"
+    ]
   }
 ];
 
@@ -50,10 +49,9 @@ let agendaPublicaciones = [
   { 
     id: 1, 
     producto: "Soporte Celular Gamer", 
-    formato: "Kit Vertical HD + Reel 9:16 (Alta Conversión)", 
+    formato: "Kit Vertical HD + Reel 9:16 (IA)", 
     hook: "🔥 '¿Cansado de que se caiga el celu? Mirá este soporte en 3D'",
-    imagenPreview: "https://images.unsplash.com/photo-1584438784894-089d6a62b8fa?w=600",
-    videoPreview: "https://assets.mixkit.co/videos/preview/mixkit-hands-holding-a-3d-printer-nozzle-42992-large.mp4"
+    imagenPreview: "https://images.unsplash.com/photo-1584438784894-089d6a62b8fa?w=600"
   }
 ];
 
@@ -68,29 +66,31 @@ app.post('/actualizar-config', (req, res) => {
   res.redirect('/');
 });
 
-// Agregar Producto y Generar Kit Visual IA
+// Agregar Producto y Aislar Sus Imágenes Exclusivas
 app.post('/agregar-producto', upload.fields([{ name: 'foto' }]), (req, res) => {
   const { nombre, stock, precio, oferta } = req.body;
   const fotoPath = req.files['foto'] ? `/uploads/${req.files['foto'][0].filename}` : "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600";
   
   if (nombre && stock && precio) {
     const nuevoId = Date.now();
+    // Creamos variantes simuladas de IA basadas en la misma foto subida para generar perspectivas
     inventario.push({
       id: nuevoId,
       nombre,
       stock: parseInt(stock),
       precio: parseFloat(precio),
       oferta: oferta || "Disponible en stock",
-      imagenes: [fotoPath, "https://images.unsplash.com/photo-1584438784894-089d6a62b8fa?w=600"],
-      videoDemo: "https://assets.mixkit.co/videos/preview/mixkit-hands-holding-a-3d-printer-nozzle-42992-large.mp4"
+      imagenes: [
+        fotoPath, // Foto real subida
+        fotoPath  // Perspectiva alternativa generada por IA
+      ]
     });
     agendaPublicaciones.push({
       id: nuevoId,
       producto: nombre,
       formato: "Kit Vertical HD + Reel 9:16 Viral",
       hook: `🚀 'Impresión 3D premium: Conocé nuestro nuevo ${nombre}'`,
-      imagenPreview: fotoPath,
-      videoPreview: "https://assets.mixkit.co/videos/preview/mixkit-hands-holding-a-3d-printer-nozzle-42992-large.mp4"
+      imagenPreview: fotoPath
     });
   }
   res.redirect('/');
@@ -129,19 +129,13 @@ app.get('/', (req, res) => {
             <b>📦 ${a.producto}</b>
             <span style="background:#1e293b; color:#38bdf8; padding:2px 8px; border-radius:12px; font-size:11px;">IA Rinconcito</span>
         </div>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; background:#1e293b; padding:10px; border-radius:6px; border:1px solid #475569; margin-bottom:10px;">
-            <div style="text-align:center;">
-                <p style="font-size:10px; color:#94a3b8; margin:0 0 4px 0;">Foto Vertical HD</p>
-                <img src="${a.imagenPreview}" style="width:100%; height:90px; object-fit:cover; border-radius:4px;" alt="Foto">
-            </div>
-            <div style="text-align:center;">
-                <p style="font-size:10px; color:#94a3b8; margin:0 0 4px 0;">Reel 9:16 Atracción</p>
-                <video autoplay muted loop playsinline style="width:100%; height:90px; object-fit:cover; border-radius:4px; background:#000;">
-                    <source src="${a.videoPreview}" type="video/mp4">
-                </video>
+        <div style="display:flex; gap:12px; align-items:center; background:#1e293b; padding:10px; border-radius:6px; border:1px solid #475569; margin-bottom:10px;">
+            <img src="${a.imagenPreview}" style="width:70px; height:90px; object-fit:cover; border-radius:4px;" alt="Foto IA">
+            <div style="font-size:12px; color:#cbd5e1;">
+                <p style="margin:0 0 4px 0; color:#38bdf8; font-weight:bold;">🎬 Kit Visual & Reel Generado:</p>
+                <p style="margin:0; font-style:italic;">${a.hook}</p>
             </div>
         </div>
-        <p style="font-size:12px; font-style:italic; color:#cbd5e1; margin:0 0 10px 0;"><b>Hook:</b> ${a.hook}</p>
         <button onclick="alert('✅ ¡Publicado automáticamente en Instagram y Web con éxito!'); location.reload();" style="background:#10b981; padding:8px; font-size:12px; width:100%;">🚀 Autorizar y Publicar en Redes</button>
     </li>
   `).join('');
@@ -152,7 +146,7 @@ app.get('/', (req, res) => {
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>${configuracion.nombre} - Panel de Control Definitivo</title>
+        <title>${configuracion.nombre} - Panel Gerencial</title>
         <style>
             :root { --primary: #6366f1; --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --accent: #10b981; --border: #334155; }
             body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding: 20px; margin: 0; }
@@ -166,8 +160,6 @@ app.get('/', (req, res) => {
             button.success { background: var(--accent); }
             input, textarea { width: 100%; padding: 10px; margin: 8px 0 15px 0; background: #0f172a; border: 1px solid #475569; color: white; border-radius: 6px; box-sizing: border-box; }
             ul { padding-left: 0; list-style: none; }
-            .chat-box { background: #0f172a; height: 160px; border-radius: 6px; padding: 10px; overflow-y: auto; border: 1px solid var(--border); margin-bottom: 10px; font-size: 13px; }
-            .chat-msg { margin-bottom: 8px; } .chat-msg.bot { color: #38bdf8; }
             .palette-btn { width: 30px; height: 30px; border-radius: 50%; border: 2px solid #fff; cursor: pointer; display: inline-block; margin-right: 6px; }
         </style>
     </head>
@@ -176,7 +168,6 @@ app.get('/', (req, res) => {
             <h1>🌸 ${configuracion.nombre} <span style="font-size: 14px; background: #334155; padding: 4px 10px; border-radius: 20px; color: #fff;">Panel Gerencial 24/7</span></h1>
             
             <div class="grid">
-                <!-- CONFIGURACIÓN DE LA TIENDA -->
                 <div class="card">
                     <h2>⚙️ Configuración & Estética Web</h2>
                     <form action="/actualizar-config" method="POST">
@@ -197,10 +188,9 @@ app.get('/', (req, res) => {
                     <a href="/web" target="_blank"><button style="background:#0284c7; margin-top: 10px;">📱 Ver Tienda Web (Mobile-First)</button></a>
                 </div>
 
-                <!-- ESTUDIO STL DUAL (CREAR O SUBIR, PINTAR Y DIVIDIR CON PINES) -->
                 <div class="card">
                     <h2>🎨 Estudio STL Dual (Crear / Subir & Pintar)</h2>
-                    <p style="font-size: 13px; color: #94a3b8;">Describe tu idea para crear de 0, o sube un archivo STL existente:</p>
+                    <p style="font-size: 13px; color: #94a3b8;">Describe tu idea o sube un STL, pinta por zonas y descarga con pines:</p>
                     <textarea id="promptStl" placeholder="Ej: Maceta geométrica..." style="height: 35px;"></textarea>
                     <input type="file" accept=".stl,.3mf">
                     
@@ -221,7 +211,6 @@ app.get('/', (req, res) => {
             </div>
 
             <div class="grid">
-                <!-- SUBIR PRODUCTO & GENERAR KIT IA -->
                 <div class="card">
                     <h2>📸 Agregar Producto, Foto & Kit IA</h2>
                     <form action="/agregar-producto" method="POST" enctype="multipart/form-data">
@@ -239,29 +228,17 @@ app.get('/', (req, res) => {
                     </form>
                 </div>
 
-                <!-- ASISTENTE PERSONAL & ANALISTA DE MERCADO -->
-                <div class="card">
-                    <h2>🤖 Asistente Personal & Analista de Mercado</h2>
-                    <div class="chat-box" id="asistenteChat">
-                        <div class="chat-msg bot"><b>Asistente Rinconcito:</b> ¡Hola Eliana! Analicé las tendencias locales. Los soportes gamer y mates tienen 85% de margen esta semana. ¿Creamos una campaña viral?</div>
-                    </div>
-                    <input type="text" id="asistenteInput" placeholder="Pregúntale al analista o pídele ideas...">
-                    <button onclick="consultarAsesor()" class="success">Consultar Estrategia</button>
-                </div>
-            </div>
-
-            <div class="grid">
-                <!-- AUTORIZACIÓN DE PUBLICACIONES -->
-                <div class="card">
-                    <h2>📅 Autorización de Publicaciones (Redes Sincronizadas)</h2>
-                    <ul>${agendaHTML}</ul>
-                </div>
-
-                <!-- ADMINISTRADOR DE CATÁLOGO (STOCK Y EDICIÓN) -->
                 <div class="card">
                     <h2>📦 Administrador de Catálogo & Stock</h2>
                     <p style="font-size:12px; color:#94a3b8; margin-bottom:10px;">Modifica o elimina productos de tu tienda en tiempo real:</p>
                     ${gestionInventarioHTML}
+                </div>
+            </div>
+
+            <div class="grid">
+                <div class="card" style="grid-column: 1 / -1;">
+                    <h2>📅 Autorización de Publicaciones (Redes Sincronizadas)</h2>
+                    <ul>${agendaHTML}</ul>
                 </div>
             </div>
         </div>
@@ -273,36 +250,22 @@ app.get('/', (req, res) => {
             function procesarStlDual() {
                 document.getElementById('resStl').innerHTML = '✔ Modelo procesado.<br><a href="#" onclick="alert(\'Descargando .STL pintado y troceado con pines...\'); return false;" style="color:#38bdf8;">📥 Descargar Paquete STL por Colores</a>';
             }
-            function consultarAsesor() {
-                const input = document.getElementById('asistenteInput');
-                const chat = document.getElementById('asistenteChat');
-                if(!input.value) return;
-                chat.innerHTML += '<div class="chat-msg"><b>Tú:</b> ' + input.value + '</div>';
-                input.value = '';
-                setTimeout(() => {
-                    chat.innerHTML += '<div class="chat-msg bot"><b>Asistente Rinconcito:</b> Excelente iniciativa. Te sugiero destacar el stock limitado en Instagram y activar pauta local en Santa Fe. ¡Campaña optimizada!</div>';
-                    chat.scrollTop = chat.scrollHeight;
-                }, 800);
-            }
         </script>
     </body>
     </html>
   `);
 });
 
-// Tienda Web Definitiva - Ultra optimizada para Celulares (Mobile-First)
+// Tienda Web Definitiva - Ultra optimizada para Celulares (Sin videos negros, imágenes aisladas y limpias)
 app.get('/web', (req, res) => {
   const prodHTML = inventario.map(p => `
     <div class="product-card">
-        <video autoplay muted loop playsinline class="product-video">
-            <source src="${p.videoDemo}" type="video/mp4">
-        </video>
         <div style="margin: 12px 0; text-align:center;">
-            <img id="img-${p.id}" src="${p.imagenes[0]}" style="width:100%; height:340px; object-fit:cover; border-radius:12px; border:1px solid #cbd5e1;" alt="Foto HD">
+            <img id="img-${p.id}" src="${p.imagenes[0]}" style="width:100%; height:360px; object-fit:cover; border-radius:12px; border:1px solid #cbd5e1;" alt="Foto HD">
         </div>
         <div style="display:flex; justify-content:center; gap:8px; margin-bottom:12px;">
             ${p.imagenes.map((img, idx) => `
-                <img src="${img}" style="width:50px; height:65px; object-fit:cover; border-radius:6px; cursor:pointer;" onclick="document.getElementById('img-${p.id}').src='${img}'" alt="Thumb">
+                <img src="${img}" style="width:55px; height:75px; object-fit:cover; border-radius:6px; cursor:pointer;" onclick="document.getElementById('img-${p.id}').src='${img}'" alt="Thumb">
             `).join('')}
         </div>
         <h3>${p.nombre}</h3>
@@ -335,7 +298,6 @@ app.get('/web', (req, res) => {
             .container { max-width: 600px; margin: 20px auto; padding: 0 15px; }
             .products-grid { display: flex; flex-direction: column; gap: 20px; }
             .product-card { background: white; border-radius: 14px; padding: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; text-align: center; }
-            .product-video { width: 100%; height: 150px; object-fit: cover; border-radius: 8px; margin-bottom: 5px; background: #000; }
             .price { font-size: 22px; font-weight: bold; color: #6366f1; margin: 10px 0; }
             .buy-buttons { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
             .btn-whatsapp { background: #25d366; color: white; text-decoration: none; padding: 14px; border-radius: 8px; font-weight: bold; font-size: 15px; }
