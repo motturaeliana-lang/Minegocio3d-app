@@ -23,10 +23,10 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 let configuracionTienda = {
-  nombre: "TA GUENO Store",
-  instagram: "@taguenoo",
-  whatsapp: "+54 9 3496 464054",
-  celularNoti: "+54 9 3496 464054"
+  nombre: "GRUMI 3D Store",
+  instagram: "@grumi3d",
+  whatsapp: "5493496XXXXXXXX", // Reemplaza aquí con tu número real sin espacios ni símbolos
+  celularNoti: "5493496XXXXXXXX"
 };
 
 let inventario = [
@@ -58,7 +58,7 @@ let tendenciasMercado = [
 app.post('/actualizar-config', (req, res) => {
   configuracionTienda.nombre = req.body.nombre;
   configuracionTienda.instagram = req.body.instagram;
-  configuracionTienda.whatsapp = req.body.whatsapp;
+  configuracionTienda.whatsapp = req.body.whatsapp.replace(/\D/g,''); // Limpia cualquier carácter que no sea número
   configuracionTienda.celularNoti = req.body.celularNoti;
   res.redirect('/');
 });
@@ -132,8 +132,8 @@ app.get('/', (req, res) => {
                         <input type="text" name="nombre" value="${configuracionTienda.nombre}" required>
                         <label>Instagram:</label>
                         <input type="text" name="instagram" value="${configuracionTienda.instagram}">
-                        <label>WhatsApp de Pedidos:</label>
-                        <input type="text" name="whatsapp" value="${configuracionTienda.whatsapp}">
+                        <label>WhatsApp de Pedidos (Ej: 5493496...):</label>
+                        <input type="text" name="whatsapp" value="${configuracionTienda.whatsapp}" required>
                         <label>Celular para Notificaciones:</label>
                         <input type="text" name="celularNoti" value="${configuracionTienda.celularNoti}">
                         <button type="submit" class="success">Actualizar Datos de Tienda</button>
@@ -176,7 +176,7 @@ app.get('/', (req, res) => {
                         <div class="media-preview">
                             <p style="font-size: 11px; color: #38bdf8; margin: 3px 0;"><b>Reel / TikTok (Bucle)</b></p>
                             <video autoplay muted loop playsinline>
-                                <source src="https://assets.mixkit.co/videos/preview/mixkit-hands-holding-a-3d-printer-nozzle-42992-large.mp4" type="video/mp4">
+                                <source src="https://assets.mixkit.co/videos/preview/mixkit-futuristic-light-tunnel-3-41372-large.mp4" type="video/mp4">
                             </video>
                         </div>
                     </div>
@@ -333,5 +333,5 @@ app.get('/web', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Servidor TA GUENO 3D Nube 24/7 corriendo en puerto ${PORT}`);
+  console.log(`Servidor GRUMI 3D Nube 24/7 corriendo en puerto ${PORT}`);
 });
